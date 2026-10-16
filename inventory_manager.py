@@ -41,6 +41,34 @@ def view_inventory(inventory):
         count += 1
     
 
+def add_item(inventory):
+    name = input("Enter the item name: ")
+    category = input("Enter the category: ")
+    try:
+        quantity = int(input("Enter the quantity: "))
+    except ValueError:
+        print("Quantity must be a nonnegative whole number.")
+        return
+    
+    if(len(name) == 0):
+        print("Item name cannot be empty.")
+        return
+    elif(len(category) == 0):
+        print("Category cannot be empty.")
+        return
+    elif(quantity < 0):
+        print("Quantity must be a nonnegative whole number.")
+        return
+    
+    name = name.strip("|")
+    category = category.strip("|")
+    for item in inventory:
+        if(item['Name'].lower() == name.lower()):
+            print("Item already exists.")
+            return
+    inventory.append(dict(Name=name, Category=category, Quantity=quantity))
+    print("Item added successfully.")
+
 
 
 def main():
