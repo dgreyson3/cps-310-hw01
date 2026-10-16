@@ -30,6 +30,17 @@ def save_inventory(inventory, filename):
     file.close()
     
     
+def view_inventory(inventory):
+    if len(inventory) == 0:
+        print("No inventory items found.")
+        return
+    
+    count = 1
+    for item in inventory:
+        print(f"{count}. {item['Name']} | {item['Category']} | {item['Quantity']}")
+        count += 1
+    
+
 
 
 def main():
