@@ -102,6 +102,31 @@ def remove_item(inventory):
     
     print(f"Item removed: {inventory.pop(item_num-1)['Name']}")
 
+def search_inventory(inventory):
+    search_term = input("Enter the item name to search for: ")
+    
+    if search_term == "":
+        print("Search term cannot be empty.")
+        return
+    
+    found_items = []
+    
+    for item in inventory:
+        split_name = item['Name'].split()
+        for word in split_name:
+            if search_term.lower() == word.lower():
+                found_items.append(item)
+                break
+    
+    if len(found_items) == 0:
+        print("No inventory items matched your search.")
+        return
+    elif len(found_items) > 1:
+        print("Multiple items matched your search:")
+
+        for item in found_items:
+            print(f"{item['Name']} | {item['Category']} | {item['Quantity']}")
+
 
 
 def main():
