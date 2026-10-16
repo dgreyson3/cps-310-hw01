@@ -91,6 +91,18 @@ def update_quantity(inventory):
     print("Item quantity updated successfully.")
 
 
+def remove_item(inventory):
+    view_inventory(inventory)
+    
+    item_num = int(input("Enter the item number to remove: "))
+    if item_num > len(inventory) or item_num < 1:
+        print("Invalid item number.")
+        return
+    
+    
+    print(f"Item removed: {inventory.pop(item_num-1)['Name']}")
+
+
 
 def main():
     inventory = load_inventory(INVENTORY_FILE)
