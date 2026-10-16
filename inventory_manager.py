@@ -128,6 +128,32 @@ def search_inventory(inventory):
             print(f"{item['Name']} | {item['Category']} | {item['Quantity']}")
 
 
+def display_summary(inventory):
+    unique_items = len(inventory)
+    total_quantity = sum(item['Quantity'] for item in inventory)
+    low_stock_items = 0
+    
+    for item in inventory:
+        if item['Quantity'] < 5:
+            low_stock_items += 1
+    
+    print(f"Inventory Summary")
+    print(f"Unique Items: {unique_items}")
+    print(f"Total Quantity: {total_quantity}")
+    print(f"Low-stock Items: {low_stock_items}")
+    
+    print("\nItems by category:")
+    category_dict = {}
+    for item in inventory:
+        if item['Category'].lower() in category_dict:
+            category_dict[item['Category'].lower()] += 1
+        else:
+            category_dict[item['Category'].lower()] = 1
+            
+    for category, count in category_dict.items():
+        print(f"{category}: {count}")
+
+
 
 def main():
     inventory = load_inventory(INVENTORY_FILE)
