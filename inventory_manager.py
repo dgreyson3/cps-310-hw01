@@ -111,6 +111,7 @@ def search_inventory(inventory):
     
     found_items = []
     
+    # already made the function wihtout seperate branch on accident
     for item in inventory:
         split_name = item['Name'].split()
         for word in split_name:
