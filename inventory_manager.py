@@ -69,6 +69,27 @@ def add_item(inventory):
     inventory.append(dict(Name=name, Category=category, Quantity=quantity))
     print("Item added successfully.")
 
+def update_quantity(inventory):
+    view_inventory(inventory)
+    
+    item_num = int(input("Enter the item number to update: "))
+    if item_num > len(inventory) or item_num < 1:
+        print("Invalid item number.")
+        return
+    
+    item_amount = input("Enter the new quantity: ")
+    try:
+        item_amount = int(item_amount)
+        if item_amount < 0:
+            print("Quantity must be a nonnegative whole number.")
+            return
+    except ValueError:
+        print("Quantity must be a nonnegative whole number.")
+        return
+
+    inventory[item_num-1]['Quantity'] = item_amount
+    print("Item quantity updated successfully.")
+
 
 
 def main():
