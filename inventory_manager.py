@@ -10,16 +10,18 @@ def display_menu():
 
 def load_inventory(filename):
     inventory = []
-    
-    file = open(filename, 'r')
-    
-    for line in file:
-        item = line.split('|')
-        inventory.append(dict(Name=item[0], Category=item[1], Quantity=int(item[2])))
+    try:
+        file = open(filename, 'r')
+        for line in file:
+            item = line.split('|')
+            inventory.append(dict(Name=item[0], Category=item[1], Quantity=int(item[2])))
+            
         
-    file.close()
-    
-    return inventory
+        file.close()  
+        return inventory
+    except Exception as error:
+        print(f"Error loading inventory: {error}")
+
 
 def save_inventory(inventory, filename):
     file = open(filename, 'w')
@@ -71,8 +73,12 @@ def add_item(inventory):
 
 def update_quantity(inventory):
     view_inventory(inventory)
+    try:
+        item_num = int(input("Enter the item number to update: "))
+    except ValueError:
+        print("Invalid Number")
+        return
     
-    item_num = int(input("Enter the item number to update: "))
     if item_num > len(inventory) or item_num < 1:
         print("Invalid item number.")
         return
@@ -94,7 +100,12 @@ def update_quantity(inventory):
 def remove_item(inventory):
     view_inventory(inventory)
     
-    item_num = int(input("Enter the item number to remove: "))
+    try:
+        item_num = int(input("Enter the item number to remove: "))
+    except ValueError:
+        print("Invalid item number.")
+        return
+    
     if item_num > len(inventory) or item_num < 1:
         print("Invalid item number.")
         return
@@ -158,8 +169,12 @@ def display_summary(inventory):
 
 def main():
     inventory = load_inventory(INVENTORY_FILE)
+    
+    start = True
+    if inventory == None:
+        start = False
 
-    while True:
+    while start:
         display_menu()
         
         user_input = input("Select an option: ")
@@ -180,6 +195,8 @@ def main():
             display_summary(inventory)
         else:
             return
+        save_inventory(inventory, INVENTORY_FILE)
+        print("Inventory saved successfully.")
      
 
 if __name__ == "__main__":
