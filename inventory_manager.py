@@ -6,9 +6,19 @@ INVENTORY_FILE = "inventory.txt"
 
 
 def display_menu():
+    """Display the inventory manager menu options."""
     print("Inventory Manager\n\n1. View inventory\n2. Add an item\n3. Update an item quantity\n4. Remove an item\n5. Search inventory\n6. View inventory summary\n7. Exit")
 
 def load_inventory(filename):
+    """Load inventory items from a pipe-delimited file.
+
+    Args:
+        filename (str): Path to the inventory file.
+
+    Returns:
+        list[dict] or None: Inventory items containing Name, Category, and
+            Quantity, or None if an error occurs.
+    """
     inventory = []
     try:
         file = open(filename, 'r')
@@ -24,6 +34,12 @@ def load_inventory(filename):
 
 
 def save_inventory(inventory, filename):
+    """Save inventory items to a pipe-delimited file, overwriting its contents.
+
+    Args:
+        inventory (list[dict]): Inventory items to save.
+        filename (str): Path to the destination file.
+    """
     file = open(filename, 'w')
     
     for item in inventory:
@@ -33,6 +49,11 @@ def save_inventory(inventory, filename):
     
     
 def view_inventory(inventory):
+    """Display a numbered list of inventory items or a message if empty.
+
+    Args:
+        inventory (list[dict]): Inventory items to display.
+    """
     if len(inventory) == 0:
         print("No inventory items found.")
         return
@@ -44,6 +65,14 @@ def view_inventory(inventory):
     
 
 def add_item(inventory):
+    """Prompt for and add an inventory item after validating the input.
+
+    Reject empty names or categories, invalid or negative quantities, and
+    duplicate item names using a case-insensitive comparison.
+
+    Args:
+        inventory (list[dict]): Inventory list to modify.
+    """
     name = input("Enter the item name: ")
     category = input("Enter the category: ")
     try:
@@ -72,6 +101,14 @@ def add_item(inventory):
     print("Item added successfully.")
 
 def update_quantity(inventory):
+    """Prompt for an item number and update its quantity.
+
+    Reject invalid item numbers and quantities that are not nonnegative
+    whole numbers.
+
+    Args:
+        inventory (list[dict]): Inventory list to modify.
+    """
     view_inventory(inventory)
     try:
         item_num = int(input("Enter the item number to update: "))
@@ -98,6 +135,13 @@ def update_quantity(inventory):
 
 
 def remove_item(inventory):
+    """Prompt for an item number and remove the corresponding item.
+
+    Display an error message if the item number is invalid.
+
+    Args:
+        inventory (list[dict]): Inventory list to modify.
+    """
     view_inventory(inventory)
     
     try:
@@ -114,6 +158,15 @@ def remove_item(inventory):
     print(f"Item removed: {inventory.pop(item_num-1)['Name']}")
 
 def search_inventory(inventory):
+    """Search item names for a case-insensitive whole-word match.
+
+    Prompt for a search term and reject an empty entry. Display matching
+    items when multiple items match, or a message when none match.
+    A single matching item is not displayed.
+
+    Args:
+        inventory (list[dict]): Inventory items to search.
+    """
     search_term = input("Enter the item name to search for: ")
     
     if search_term == "":
@@ -141,6 +194,14 @@ def search_inventory(inventory):
 
 
 def display_summary(inventory):
+    """Display item counts, total quantity, low stock, and category counts.
+
+    Count items with quantities below five as low stock and group category
+    names case-insensitively.
+
+    Args:
+        inventory (list[dict]): Inventory items to summarize.
+    """
     unique_items = len(inventory)
     total_quantity = sum(item['Quantity'] for item in inventory)
     low_stock_items = 0
@@ -168,6 +229,11 @@ def display_summary(inventory):
 
 
 def main():
+    """Load inventory and run the interactive inventory manager.
+
+    Process menu options and save inventory after each option from 1 to 6.
+    Exit if loading fails or the user enters any other option.
+    """
     inventory = load_inventory(INVENTORY_FILE)
     
     start = True
