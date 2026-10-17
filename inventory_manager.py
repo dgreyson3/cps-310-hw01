@@ -159,7 +159,28 @@ def display_summary(inventory):
 def main():
     inventory = load_inventory(INVENTORY_FILE)
 
-
+    while True:
+        display_menu()
+        
+        user_input = input("Select an option: ")
+        
+        print("\n")
+        
+        if user_input == "1":
+            view_inventory(inventory)
+        elif user_input == "2":
+            add_item(inventory)
+        elif user_input == "3":
+            update_quantity(inventory)
+        elif user_input == "4":
+            remove_item(inventory)
+        elif user_input == "5":
+            search_inventory(inventory)
+        elif user_input == "6":
+            display_summary(inventory)
+        else:
+            return
+     
 
 if __name__ == "__main__":
     main()
