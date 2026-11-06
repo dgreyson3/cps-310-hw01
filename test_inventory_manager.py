@@ -1,6 +1,6 @@
 import pytest
 
-from inventory_manager import load_inventory, save_inventory, find_matching_items
+from inventory_manager import load_inventory, save_inventory, find_matching_items, remove_item_by_number
 
 
 @pytest.fixture
@@ -113,13 +113,13 @@ def test_save_and_load_round_trip(tmp_path, sample_inventory):
 )
 
 def test_search_returns_matching_items(sample_inventory, search_term, expected_names):
-    # Arrange
+    #Arrange
     inventory = sample_inventory
 
-    # Act
+    #Act
     result = find_matching_items(inventory, search_term)
 
-    # Assert
+    #Assert
     actual_names = []
 
     for item in result:
@@ -129,11 +129,50 @@ def test_search_returns_matching_items(sample_inventory, search_term, expected_n
 
 @pytest.mark.parametrize("search_term",["", "   "],ids=["empty", "whitespace"],)
 def test_search_rejects_blank_term(sample_inventory, search_term):
-    # Arrange
+    #Arrange
     inventory = sample_inventory
 
-    # Act
+    #Act
     result = find_matching_items(inventory, search_term)
 
-    # Assert
+    #Assert
     assert result == "Search term cannot be empty."
+    
+@pytest.mark.parametrize(
+    "item_number, expected_names",
+    [
+        (1, ["Pencil", "Water Bottle", "Coffee Mug"]),
+        (2, ["Notebook", "Water Bottle", "Coffee Mug"]),
+        (4, ["Notebook", "Pencil", "Water Bottle"]),
+    ],
+    ids=["first", "middle", "last"],
+)
+def test_remove_item(sample_inventory, item_number, expected_names):
+    #Arrange
+    inventory = sample_inventory
+
+    #Act
+    remove_item_by_number(inventory, item_number)
+
+    #Assert
+    actual_names = []
+    for item in inventory:
+        actual_names.append(item["Name"])
+
+    assert actual_names == expected_names
+    
+    
+@pytest.mark.parametrize("item_number",[0, -1, 5],ids=["zero", "negative", "too-large"],)
+def test_remove_invalid_number(sample_inventory, item_number):
+    #Arrange
+    inventory = sample_inventory
+    original_inventory = []
+    for item in inventory:
+        original_inventory.append(item.copy())
+
+    #Act
+    result = remove_item_by_number(inventory, item_number)
+
+    #Assert
+    assert result is None
+    assert inventory == original_inventory

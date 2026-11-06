@@ -133,6 +133,13 @@ def update_quantity(inventory):
     inventory[item_num-1]['Quantity'] = item_amount
     print("Item quantity updated successfully.")
 
+#AI GENERATED FUNCTION TESTED AND VERIFIED
+def remove_item_by_number(inventory, item_number):
+    """Remove an item by its displayed number."""
+    if item_number < 1 or item_number > len(inventory):
+        return None
+
+    return inventory.pop(item_number - 1)
 
 def remove_item(inventory):
     """Prompt for an item number and remove the corresponding item.
@@ -150,12 +157,12 @@ def remove_item(inventory):
         print("Invalid item number.")
         return
     
-    if item_num > len(inventory) or item_num < 1:
+    removed_item = remove_item_by_number(inventory, item_num)
+
+    if removed_item is None:
         print("Invalid item number.")
-        return
-    
-    
-    print(f"Item removed: {inventory.pop(item_num-1)['Name']}")
+    else:
+        print(f"Item removed: {removed_item['Name']}")
 
 
 #added a helper function to make testing specific functionality easier
