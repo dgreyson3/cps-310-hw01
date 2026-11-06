@@ -157,6 +157,23 @@ def remove_item(inventory):
     
     print(f"Item removed: {inventory.pop(item_num-1)['Name']}")
 
+
+#added a helper function to make testing specific functionality easier
+def find_matching_items(inventory, search_term):
+    """Return partial name matches, ignoring capitalization."""
+    search_term = search_term.strip()
+
+    if search_term == "":
+        return "Search term cannot be empty."
+
+    found_items = []
+
+    for item in inventory:
+        if search_term.lower() in item["Name"].lower():
+            found_items.append(item)
+
+    return found_items
+
 def search_inventory(inventory):
     """Search item names for a case-insensitive whole-word match.
 
@@ -169,8 +186,10 @@ def search_inventory(inventory):
     """
     search_term = input("Enter the item name to search for: ").strip()
     
-    if search_term == "":
-        print("Search term cannot be empty.")
+    try:
+        found_items = find_matching_items(inventory, search_term)
+    except ValueError as error:
+        print(error)
         return
     
     found_items = []

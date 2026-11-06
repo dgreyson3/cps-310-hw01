@@ -1,6 +1,6 @@
 import pytest
 
-from inventory_manager import load_inventory, save_inventory
+from inventory_manager import load_inventory, save_inventory, find_matching_items
 
 
 @pytest.fixture
@@ -98,3 +98,42 @@ def test_save_and_load_round_trip(tmp_path, sample_inventory):
 
     #Assert
     assert result == sample_inventory
+    
+    
+@pytest.mark.parametrize(
+    "search_term, expected_names",
+    [
+        ("Notebook", ["Notebook"]),
+        ("note", ["Notebook"]),
+        ("NOTEBOOK", ["Notebook"]),
+        ("o", ["Notebook", "Water Bottle", "Coffee Mug"]),
+        ("Laptop", []),
+    ],
+    ids=["exact", "partial", "ignore-case", "multiple", "no-match"],
+)
+
+def test_search_returns_matching_items(sample_inventory, search_term, expected_names):
+    # Arrange
+    inventory = sample_inventory
+
+    # Act
+    result = find_matching_items(inventory, search_term)
+
+    # Assert
+    actual_names = []
+
+    for item in result:
+        actual_names.append(item["Name"])
+
+    assert actual_names == expected_names
+
+@pytest.mark.parametrize("search_term",["", "   "],ids=["empty", "whitespace"],)
+def test_search_rejects_blank_term(sample_inventory, search_term):
+    # Arrange
+    inventory = sample_inventory
+
+    # Act
+    result = find_matching_items(inventory, search_term)
+
+    # Assert
+    assert result == "Search term cannot be empty."
