@@ -1,6 +1,6 @@
 import pytest
 
-from inventory_manager import load_inventory, save_inventory, find_matching_items, remove_item_by_number
+from inventory_manager import load_inventory, save_inventory, find_matching_items, remove_item_by_number,  update_item_quantity
 
 
 @pytest.fixture
@@ -175,4 +175,54 @@ def test_remove_invalid_number(sample_inventory, item_number):
 
     #Assert
     assert result is None
+    assert inventory == original_inventory
+
+
+@pytest.mark.parametrize("new_quantity",[8, 0],ids=["normal-quantity", "zero-quantity"],)
+def test_update_quantity(sample_inventory, new_quantity):
+    #Arrange
+    inventory = sample_inventory
+    expected_inventory = [
+        {"Name": "Notebook", "Category": "School", "Quantity": 10},
+        {"Name": "Pencil", "Category": "school", "Quantity": new_quantity},
+        {"Name": "Water Bottle", "Category": "Kitchen", "Quantity": 5},
+        {"Name": "Coffee Mug", "Category": "Kitchen", "Quantity": 0},
+    ]
+
+    #Act
+    result = update_item_quantity(inventory,2, new_quantity)
+
+    #Assert
+    assert result is None
+    assert inventory == expected_inventory
+    
+@pytest.mark.parametrize("item_number",[0, -1, 5],ids=["zero", "negative", "too-large"],)
+def test_update_rejects_invalid_number(sample_inventory, item_number):
+    #Arrange
+    inventory = sample_inventory
+    original_inventory = []
+
+    for item in inventory:
+        original_inventory.append(item.copy())
+
+    #Act
+    result = update_item_quantity(inventory,item_number,8)
+
+    #Assert
+    assert result == "Invalid item number."
+    assert inventory == original_inventory
+
+def test_update_rejects_negative_quantity(sample_inventory):
+    #Arrange
+    inventory = sample_inventory
+    original_inventory = []
+
+    for item in inventory:
+        original_inventory.append(item.copy())
+
+    #Act
+    result = update_item_quantity(inventory,2,-1)
+
+    #Assert
+    assert result == "Quantity must be a nonnegative whole number."
     assert inventory == original_inventory

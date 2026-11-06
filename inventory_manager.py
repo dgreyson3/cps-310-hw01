@@ -100,6 +100,16 @@ def add_item(inventory):
     inventory.append(dict(Name=name, Category=category, Quantity=quantity))
     print("Item added successfully.")
 
+def update_item_quantity(inventory, item_number, new_quantity):
+    if item_number < 1 or item_number > len(inventory):
+        return "Invalid item number."
+
+    if new_quantity < 0:
+        return "Quantity must be a nonnegative whole number."
+
+    inventory[item_number - 1]["Quantity"] = new_quantity
+    return None
+
 def update_quantity(inventory):
     """Prompt for an item number and update its quantity.
 
@@ -130,8 +140,13 @@ def update_quantity(inventory):
         print("Quantity must be a nonnegative whole number.")
         return
 
-    inventory[item_num-1]['Quantity'] = item_amount
-    print("Item quantity updated successfully.")
+    
+    result = update_item_quantity(inventory, item_num, item_amount)
+
+    if result is None:
+        print("Item quantity updated successfully.")
+    else:
+        print(result)
 
 #AI GENERATED FUNCTION TESTED AND VERIFIED
 def remove_item_by_number(inventory, item_number):
