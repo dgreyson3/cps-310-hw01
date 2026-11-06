@@ -21,16 +21,18 @@ def load_inventory(filename):
     """
     inventory = []
     try:
-        file = open(filename, 'r')
-        for line in file:
-            item = line.split('|')
-            inventory.append(dict(Name=item[0], Category=item[1], Quantity=int(item[2])))
+        with open(filename, 'r') as file:
+            for line in file:
+                if not line.strip():
+                    continue
+                
+                item = line.split('|')
+                inventory.append(dict(Name=item[0], Category=item[1], Quantity=int(item[2])))
             
-        
-        file.close()  
-        return inventory
-    except Exception as error:
-        print(f"Error loading inventory: {error}")
+    except FileNotFoundError:
+        return []
+    
+    return inventory
 
 
 def save_inventory(inventory, filename):
@@ -40,12 +42,10 @@ def save_inventory(inventory, filename):
         inventory (list[dict]): Inventory items to save.
         filename (str): Path to the destination file.
     """
-    file = open(filename, 'w')
-    
-    for item in inventory:
-        file.write(f"{item['Name']}|{item['Category']}|{item['Quantity']}\n")
-    
-    file.close()
+    with open(filename, 'w') as file: 
+        for item in inventory:
+            file.write(f"{item['Name']}|{item['Category']}|{item['Quantity']}\n")
+        file.close()
     
     
 def view_inventory(inventory):
@@ -167,7 +167,7 @@ def search_inventory(inventory):
     Args:
         inventory (list[dict]): Inventory items to search.
     """
-    search_term = input("Enter the item name to search for: ")
+    search_term = input("Enter the item name to search for: ").strip()
     
     if search_term == "":
         print("Search term cannot be empty.")
@@ -177,11 +177,9 @@ def search_inventory(inventory):
     
     # already made the function wihtout seperate branch on accident
     for item in inventory:
-        split_name = item['Name'].split()
-        for word in split_name:
-            if search_term.lower() == word.lower():
-                found_items.append(item)
-                break
+        if search_term.lower() in item['Name'].lower():
+            found_items.append(item)
+            break
     
     if len(found_items) == 0:
         print("No inventory items matched your search.")
@@ -191,6 +189,10 @@ def search_inventory(inventory):
 
         for item in found_items:
             print(f"{item['Name']} | {item['Category']} | {item['Quantity']}")
+    else:
+        item = found_items[0]
+        print(f"{item['Name']} | {item['Category']} | {item['Quantity']}")
+        
 
 
 def display_summary(inventory):
@@ -259,8 +261,13 @@ def main():
             search_inventory(inventory)
         elif user_input == "6":
             display_summary(inventory)
-        else:
+        elif user_input == "7":
+            print("Goodbye! Program saving and closing. ")
             return
+        else:
+            print("Invalid menu choice. Please enter a number from 1 to 7.")
+            continue
+            
         save_inventory(inventory, INVENTORY_FILE)
         print("Inventory saved successfully.")
      
