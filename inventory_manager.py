@@ -250,6 +250,29 @@ def search_inventory(inventory):
         print(f"{item['Name']} | {item['Category']} | {item['Quantity']}")
         
 
+def calculate_summary(inventory):
+    unique_items = len(inventory)
+    total_quantity = sum(item['Quantity'] for item in inventory)
+    low_stock_items = 0
+
+    for item in inventory:
+        if item['Quantity'] < 5:
+            low_stock_items += 1
+
+    category_dict = {}
+    for item in inventory:
+        if item['Category'].lower() in category_dict:
+            category_dict[item['Category'].lower()] += 1
+        else:
+            category_dict[item['Category'].lower()] = 1
+
+    return {
+        "unique_items": unique_items,
+        "total_quantity": total_quantity,
+        "low_stock_items": low_stock_items,
+        "category_counts": category_dict,
+    }
+    
 
 def display_summary(inventory):
     """Display item counts, total quantity, low stock, and category counts.
@@ -260,28 +283,15 @@ def display_summary(inventory):
     Args:
         inventory (list[dict]): Inventory items to summarize.
     """
-    unique_items = len(inventory)
-    total_quantity = sum(item['Quantity'] for item in inventory)
-    low_stock_items = 0
-    
-    for item in inventory:
-        if item['Quantity'] < 5:
-            low_stock_items += 1
-    
+    summary = calculate_summary(inventory)
+
     print(f"Inventory Summary")
-    print(f"Unique Items: {unique_items}")
-    print(f"Total Quantity: {total_quantity}")
-    print(f"Low-stock Items: {low_stock_items}")
-    
+    print(f"Unique Items: {summary["unique_items"]}")
+    print(f"Total Quantity: {summary["total_quantity"]}")
+    print(f"Low-stock Items: {summary["low_stock_items"]}")
+
     print("\nItems by category:")
-    category_dict = {}
-    for item in inventory:
-        if item['Category'].lower() in category_dict:
-            category_dict[item['Category'].lower()] += 1
-        else:
-            category_dict[item['Category'].lower()] = 1
-            
-    for category, count in category_dict.items():
+    for category, count in summary["category_counts"].items():
         print(f"{category}: {count}")
 
 

@@ -1,6 +1,6 @@
 import pytest
 
-from inventory_manager import load_inventory, save_inventory, find_matching_items, remove_item_by_number,  update_item_quantity, validate_new_item
+from inventory_manager import load_inventory, save_inventory, find_matching_items, remove_item_by_number,  update_item_quantity, validate_new_item, calculate_summary
 
 
 @pytest.fixture
@@ -252,9 +252,7 @@ def test_update_rejects_negative_quantity(sample_inventory):
         "nonnumeric-quantity",
     ],
 )
-def test_validate_new_item(
-    sample_inventory, name, category, quantity, expected_error
-):
+def test_validate_new_item(sample_inventory, name, category, quantity, expected_error):
     #Arrange
     inventory = sample_inventory
 
@@ -263,3 +261,30 @@ def test_validate_new_item(
 
     #Assert
     assert result == expected_error
+    
+def test_summary(sample_inventory):
+    #Arrange
+    inventory = sample_inventory
+
+    #Act
+    result = calculate_summary(inventory)
+
+    #Assert
+    assert result["unique_items"] == 4
+    assert result["total_quantity"] == 19
+    assert result["low_stock_items"] == 2
+    assert result["category_counts"] == {"school": 2, "kitchen": 2}
+
+
+def test_summary_empty():
+    #Arrange
+    inventory = []
+
+    #Act
+    result = calculate_summary(inventory)
+
+    #Assert
+    assert result["unique_items"] == 0
+    assert result["total_quantity"] == 0
+    assert result["low_stock_items"] == 0
+    assert result["category_counts"] == {}
