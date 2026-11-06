@@ -1,0 +1,100 @@
+import pytest
+
+from inventory_manager import load_inventory, save_inventory
+
+
+@pytest.fixture
+def sample_inventory():
+    """Return fresh sample data for each test."""
+    return [
+        {"Name": "Notebook", "Category": "School", "Quantity": 10},
+        {"Name": "Pencil", "Category": "school", "Quantity": 4},
+        {"Name": "Water Bottle", "Category": "Kitchen", "Quantity": 5},
+        {"Name": "Coffee Mug", "Category": "Kitchen", "Quantity": 0},
+    ]
+
+def test_load_inventory_reads_file(tmp_path, sample_inventory):
+    # Arrange
+    inventory_path = tmp_path / "inventory.txt"
+    inventory_path.write_text("Notebook|School|10\nPencil|school|4\nWater Bottle|Kitchen|5\nCoffee Mug|Kitchen|0\n")
+    
+    #Act
+    result = load_inventory(inventory_path)
+    
+    #Assert
+    assert result == sample_inventory
+    
+def test_load_inventory_converts_int(tmp_path):
+    # Arrange
+    inventory_path = tmp_path / "inventory.txt"
+    inventory_path.write_text("Notebook|School|10\nPencil|school|4\nWater Bottle|Kitchen|5\nCoffee Mug|Kitchen|0\n")
+    
+    #Act
+    result = load_inventory(inventory_path)
+    
+    #Assert
+    assert len(result) == 4
+    assert result[0]["Quantity"] == 10
+    assert result[1]["Quantity"] == 4
+    assert result[2]["Quantity"] == 5
+    assert result[3]["Quantity"] == 0
+
+    for item in result:
+        assert type(item["Quantity"]) is int
+        
+
+def test_load_inventory_ignores_blank(tmp_path, sample_inventory):
+    #Arrange
+    inventory_path = tmp_path / "inventory.txt"
+    inventory_path.write_text("Notebook|School|10\nPencil|school|4\nWater Bottle|Kitchen|5\n\n\n\nCoffee Mug|Kitchen|0\n")
+    
+    #Act
+    result = load_inventory(inventory_path)
+    
+    #Assert
+    assert result == sample_inventory
+    
+def test_load_inventory_missing_files(tmp_path):
+    #Arrange
+    inventory_path = tmp_path / "missing.txt"
+    
+    #Act
+    result = load_inventory(inventory_path)
+    
+    # Assert
+    assert result == []
+    
+    
+def test_save_inventory_format(tmp_path, sample_inventory):
+    #Arrange
+    inventory_path = tmp_path / "inventory.txt"
+    text = "Notebook|School|10\nPencil|school|4\nWater Bottle|Kitchen|5\nCoffee Mug|Kitchen|0\n"
+
+    
+    #Act
+    save_inventory(sample_inventory, inventory_path)
+    
+    assert inventory_path.read_text() == text
+    
+
+def test_save_empty_inventory(tmp_path):
+    #Arrange
+    inventory_path = tmp_path / "inventory.txt"
+    inventory_path.write_text("Notebook|School|10\nPencil|school|4\nWater Bottle|Kitchen|5\n\n\n\nCoffee Mug|Kitchen|0\n")
+
+    #Act
+    save_inventory([], inventory_path)
+    
+    #Assert
+    assert inventory_path.read_text() == ""
+    
+def test_save_and_load_round_trip(tmp_path, sample_inventory):
+    #Arrange
+    inventory_path = tmp_path / "inventory.txt"
+
+    #Act
+    save_inventory(sample_inventory, inventory_path)
+    result = load_inventory(inventory_path)
+
+    #Assert
+    assert result == sample_inventory
