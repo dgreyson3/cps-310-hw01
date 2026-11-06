@@ -64,6 +64,31 @@ def view_inventory(inventory):
         count += 1
     
 
+
+def validate_new_item(inventory, name, category, quantity):
+    """Return an error message, or None when the item is valid."""
+    try:
+        quantity = int(quantity)
+    except ValueError:
+        return "Quantity must be a nonnegative whole number."
+
+    if name.strip() == "":
+        return "Item name cannot be empty."
+    elif category.strip() == "":
+        return "Category cannot be empty."
+    elif "|" in name:
+        return "Item name cannot contain |."
+    elif "|" in category:
+        return "Category cannot contain |."
+    elif quantity < 0:
+        return "Quantity must be a nonnegative whole number."
+
+    for item in inventory:
+        if item["Name"].lower() == name.lower():
+            return "Item already exists."
+
+    return None
+
 def add_item(inventory):
     """Prompt for and add an inventory item after validating the input.
 
@@ -81,22 +106,12 @@ def add_item(inventory):
         print("Quantity must be a nonnegative whole number.")
         return
     
-    if(len(name) == 0):
-        print("Item name cannot be empty.")
+    result = validate_new_item(inventory, name, category, quantity)
+
+    if result is not None:
+        print(result)
         return
-    elif(len(category) == 0):
-        print("Category cannot be empty.")
-        return
-    elif(quantity < 0):
-        print("Quantity must be a nonnegative whole number.")
-        return
-    
-    name = name.strip("|")
-    category = category.strip("|")
-    for item in inventory:
-        if(item['Name'].lower() == name.lower()):
-            print("Item already exists.")
-            return
+
     inventory.append(dict(Name=name, Category=category, Quantity=quantity))
     print("Item added successfully.")
 

@@ -1,6 +1,6 @@
 import pytest
 
-from inventory_manager import load_inventory, save_inventory, find_matching_items, remove_item_by_number,  update_item_quantity
+from inventory_manager import load_inventory, save_inventory, find_matching_items, remove_item_by_number,  update_item_quantity, validate_new_item
 
 
 @pytest.fixture
@@ -226,3 +226,40 @@ def test_update_rejects_negative_quantity(sample_inventory):
     #Assert
     assert result == "Quantity must be a nonnegative whole number."
     assert inventory == original_inventory
+    
+@pytest.mark.parametrize(
+    "name, category, quantity, expected_error",
+    [
+        ("Eraser", "School", 3, None),
+        ("", "School", 3, "Item name cannot be empty."),
+        ("Eraser", "", 3, "Category cannot be empty."),
+        ("Era|ser", "School", 3, "Item name cannot contain |."),
+        ("Eraser", "Sch|ool", 3, "Category cannot contain |."),
+        ("Eraser", "School", -1, "Quantity must be a nonnegative whole number."),
+        ("Notebook", "School", 3, "Item already exists."),
+        ("NOTEBOOK", "School", 3, "Item already exists."),
+        ("Eraser", "School", "abc", "Quantity must be a nonnegative whole number."),
+    ],
+    ids=[
+        "valid",
+        "empty-name",
+        "empty-category",
+        "pipe-in-name",
+        "pipe-in-category",
+        "negative-quantity",
+        "duplicate",
+        "duplicate-ignore-case",
+        "nonnumeric-quantity",
+    ],
+)
+def test_validate_new_item(
+    sample_inventory, name, category, quantity, expected_error
+):
+    #Arrange
+    inventory = sample_inventory
+
+    #Act
+    result = validate_new_item(inventory, name, category, quantity)
+
+    #Assert
+    assert result == expected_error
